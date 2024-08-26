@@ -3,75 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByteWar - Code Editor</title>
+    <title>ByteWar - Coding Environment</title>
+    <link rel="stylesheet" href="codeStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/editor/editor.main.min.css">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            background-color: #1e1e1e;
-        }
-        .navbar {
-            width: 100%;
-            padding: 10px 20px;
-            background-color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar h1 {
-            margin: 0;
-            color: white;
-            font-family: 'Jost', sans-serif;
-            font-weight: 500;
-        }
-        #editor {
-            width: 80%;
-            height: calc(100% - 60px); /* Adjusting for the navbar height */
-            border: 1px solid #333;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-    </style>
 </head>
 <body>
+    <nav>
     <div class="navbar">
         <h1>ByteWar</h1>
+        <div style="margin-left: 500px;" id="timer">60:00</div>        
     </div>
-    <div id="editor"></div>
+</nav>
+
+    <div class="container">
+        <div class="question-panel">
+            <div class="title-section">
+                <h2>Question Title</h2>
+            </div>
+            <div class="description-section">
+                <p>Question Description goes here...</p>
+            </div>
+            <div class="output-section">
+                <h3>Expected Output:</h3>
+                <p>Output description goes here...</p>
+            </div>
+            <button class="submit-button">Submit</button>
+        </div>
+        <div class="resizer"></div> <!-- Divider between panels -->
+        <div id="editor" class="code-editor"></div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
-    <script>
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
-
-        require(['vs/editor/editor.main'], function() {
-            const editor = monaco.editor.create(document.getElementById('editor'), {
-                value: "// Start coding here...\n",
-                language: "c", // Set the default language
-                theme: "vs-dark", // Dark theme
-                automaticLayout: true
-            });
-
-            // Disable Copy-Paste Functionality within the Monaco Editor
-            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {});
-            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {});
-
-            // Disable context menu (right-click) through Monaco API
-            editor.updateOptions({ contextmenu: false });
-        });
-
-        // Disable Copy-Paste Functionality across the entire webpage
-        document.addEventListener('keydown', function(event) {
-            if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'v')) {
-                event.preventDefault();
-            }
-        });
-
-        document.addEventListener('contextmenu', function(event) {
-            event.preventDefault();
-        });
-    </script>
+    <script src="code.js"></script>
 </body>
 </html>

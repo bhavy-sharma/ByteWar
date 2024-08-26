@@ -1,0 +1,101 @@
+/* General styling */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar styling */
+.navbar {
+    display: flex;
+    
+    width: 100%;
+}
+
+#timer {
+    margin-left: 500px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin: 0 20px;
+    font-size: 24px;
+    color: white;
+}
+
+.navbar h1 {
+    margin: 0;
+    color: white;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+}
+
+/* Container styling */
+.container {
+    display: flex;
+    height: calc(100% - 60px);
+    position: relative;
+}
+
+/* Question panel styling */
+.question-panel {
+    width: 40%;
+    background-color: #282828;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s;
+}
+
+.title-section h2 {
+    margin-top: 0;
+    color: #ffffff;
+}
+
+.description-section {
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+
+.output-section h3 {
+    margin-bottom: 5px;
+}
+
+.submit-button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.submit-button:hover {
+    background-color: #218838;
+}
+
+/* Resizer styling */
+.resizer {
+    width: 5px;
+    background-color: #333;
+    cursor: ew-resize;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40%; /* Position it where the question panel ends */
+    z-index: 1;
+}
+
+/* Code editor styling */
+.code-editor {
+    width: 60%;
+    height: 100%;
+    border-left: 2px solid #333;
+    transition: width 0.3s;
+}
