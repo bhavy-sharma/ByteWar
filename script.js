@@ -1,18 +1,25 @@
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent form from submitting normally
+const ID = ["bhavy__sharma__", "gauravsingh7132"];
+const PASS = ["BHAVY", "GAURAV"];
 
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+document.getElementById("loginForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
 
-    // Hardcoded credentials (not secure!)
-    const validUsername = "yourUsername";
-    const validEmail = "yourEmail@example.com";
-    const validPassword = "yourPassword";
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-    if (username === validUsername && email === validEmail && password === validPassword) {
-        window.location.href = 'battle.html'; // Redirect if credentials are valid
+    let isValid = false;
+
+    for (let i = 0; i < ID.length; i++) {
+        if (username === ID[i] && password === PASS[i]) {
+            isValid = true;
+            break;
+        }
+    }
+
+    if (isValid) {
+        console.log("Valid credentials, redirecting to code.html");
+        location.href = "code.html"; // Redirect to code.html if credentials are valid
     } else {
-        alert('Invalid credentials, please try again.');
+        alert("Invalid Credential"); // Show alert only if credentials are invalid
     }
 });
