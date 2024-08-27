@@ -23,6 +23,30 @@
     </div>
     <!-- This is The Login Page Ended -->
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Get the username value
+            const username = document.getElementById('username').value;
+			
+            // Log the username to check if it's correctly captured
+            console.log("Username:", username);
+
+            // Store the username in local storage
+            localStorage.setItem('username', username);
+
+            // Check if the username is stored correctly
+            if (localStorage.getItem('username')) {
+                console.log("Username stored in local storage:", localStorage.getItem('username'));
+            } else {
+                console.error("Failed to store the username.");
+            }
+
+            // Redirect to the coding environment page (code.html)
+            window.location.href = 'code.html';
+        });
+    </script>
+	<script src="https://apis.google.com/js/api.js"></script>
 </body>
 </html>

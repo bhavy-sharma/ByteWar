@@ -9,25 +9,29 @@
 </head>
 <body>
     <nav>
-    <div class="navbar">
-        <h1>ByteWar</h1>
-        <div style="margin-left: 500px;" id="timer">60:00</div>        
-    </div>
-</nav>
+        <div class="navbar">
+            <h1>ByteWar</h1>
+            <div style="margin-left: 500px;" id="timer">60:00</div>        
+            <div id="username-display" style="margin-left: auto; padding-right: 20px; color: white;"></div>
+        </div>
+    </nav>
 
     <div class="container">
         <div class="question-panel">
             <div class="title-section">
-                <h2>Question Title</h2>
+                <h2 id="question-title">Question Title</h2>
             </div>
             <div class="description-section">
-                <p>Question Description goes here...</p>
+                <p id="question-description">Question Description goes here...</p>
             </div>
             <div class="output-section">
                 <h3>Expected Output:</h3>
-                <p>Output description goes here...</p>
+                <p id="question-output">Output description goes here...</p>
             </div>
             <button class="submit-button">Submit</button>
+            <div class="navigation">
+                <button id="next-question">Next</button>
+            </div>
         </div>
         <div class="resizer"></div> <!-- Divider between panels -->
         <div id="editor" class="code-editor"></div>
@@ -35,5 +39,19 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
     <script src="code.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        // Retrieve the username from local storage
+        const username = localStorage.getItem('username');
+        console.log(username);
+        
+
+        // Display the username in the navbar
+        if (username) {
+            document.getElementById('username-display').innerText = `${username}`;
+        }
+    </script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
 </body>
 </html>
