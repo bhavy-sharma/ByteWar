@@ -1,20 +1,13 @@
+let editor;
+let currentQuestionIndex = parseInt(localStorage.getItem('currentQuestionIndex')) || 0; // Get the current index from localStorage or default to 0
+const currentPage = window.location.pathname;
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Google API client
     gapi.load('client:auth2', initClient);
-});
 
-
-require.config({ 
-    paths: { 
-        'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' 
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-
-
-
-     // Array of questions
-     const questions = [
+    // Array of questions
+    const questions = [
         {
             title: "Sum of Two Numbers",
             description: "Write a program to calculate the sum of two numbers.",
@@ -60,6 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const randomQuestions = questions.sort(() => 0.5 - Math.random()).slice(0, 8);
     let currentQuestionIndex = 0;
 
+    let totalTimeTaken = 0; // Total time taken across all questions
+    let questionStartTime = Date.now(); // Time when the current question started
+
+    function updateTimeTaken() {
+        const timeSpent = 60 * 60 - timeLeft; // Adjust timeLeft as per your timer logic
+        return timeSpent;
+    }
+
     function updateQuestionPanel() {
         document.getElementById('question-title').textContent = randomQuestions[currentQuestionIndex].title;
         document.getElementById('question-description').textContent = randomQuestions[currentQuestionIndex].description;
@@ -68,21 +69,76 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('next-question').disabled = currentQuestionIndex === randomQuestions.length - 1;
     }
 
-    const nextButton = document.getElementById('next-question');
+        // Next Button Logic
+        const nextButton = document.getElementById('next-question');
     if (nextButton) {
         nextButton.addEventListener('click', function () {
-            if (confirm("Are You Sure You Completed this Question?\nThe Question you can't see again")) {
-                if (currentQuestionIndex < randomQuestions.length - 1) {
+            if (confirm("Are you sure you want to move to the next question?")) {
+                const codeContent = editor.getValue();
+                const username = localStorage.getItem('username') || 'Unknown User';
+                const timeTaken = updateTimeTaken();
+                const message = `Code Submission by ${username}:\n\n${codeContent}\n\nTime taken: ${timeTaken} seconds`;
+
+                sendTextToTelegram(message).then(() => {
                     currentQuestionIndex++;
-                    updateQuestionPanel();
-                }
+                    localStorage.setItem('currentQuestionIndex', currentQuestionIndex); // Update the index in localStorage
+                    localStorage.removeItem('timeLeft'); // Clear the time left for the next session
+                    if (currentQuestionIndex <= 6) {
+                        const nextPage = `code${currentQuestionIndex + 1}.html`;
+                        location.href = nextPage;
+                    } else {
+                        location.href = "thanku.html";
+                    }
+                }).catch(error => {
+                    console.error('Error during submission:', error);
+                });
             }
         });
+    }
+    
+
+    localStorage.setItem('timeLeft', 60 * 60); 
+
+    if (window.location.pathname.includes("code7.html")) {
+        const submitButton = document.getElementById('submit-button');
+        if (submitButton) {
+            submitButton.addEventListener('click', function () {
+                const codeContent = editor.getValue();
+                const username = localStorage.getItem('username') || 'Unknown User';
+                const timeSpent = 60 * 60 - timeLeft; // Calculate time spent
+                const minutesSpent = Math.floor(timeSpent / 60);
+                const secondsSpent = timeSpent % 60;
+                const formattedTime = `${minutesSpent.toString().padStart(2, '0')}:${secondsSpent.toString().padStart(2, '0')}`;
+                
+                const message = `Code Submission by ${username}:\n\n${codeContent}\n\nTotal time taken: ${formattedTime}`;
+        
+                sendTextToTelegram(message).then(() => {
+                    alert('Code submitted successfully!');
+                    location.href = "thanku.html";
+                }).catch(error => {
+                    console.error('Error during submission:', error);
+                });
+            });
+        }
+    }
+
+    function sendTextToTelegram(message) {
+        return fetch(`https://api.telegram.org/bot6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI/sendMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: 5938612536,
+                text: message
+            })
+        }).then(response => response.json());
     }
 
     updateQuestionPanel();
 
-    let timeLeft = 60 * 60;
+    // Timer Logic with Persistence
+    let timeLeft = parseInt(localStorage.getItem('timeLeft')) || 60 * 60;
     const timerDisplay = document.getElementById('timer');
     const submitButton = document.querySelector('.submit-button');
 
@@ -92,19 +148,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
+
         if (timeLeft > 0) {
             timeLeft--;
+            localStorage.setItem('timeLeft', timeLeft);  // Save the remaining time
         } else {
             clearInterval(timerInterval);
-            submitButton.disabled = true;
-            submitButton.textContent = "Time's up! Submission disabled";
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Time's up! Submission disabled";
+            }
         }
     }
 
     const timerInterval = setInterval(updateTimer, 1000);
 
+    // Load Monaco Editor
+    require.config({ 
+        paths: { 
+            'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' 
+        }
+    });
+
     require(['vs/editor/editor.main'], function() {
-        const editor = monaco.editor.create(document.getElementById('editor'), {
+        editor = monaco.editor.create(document.getElementById('editor'), {
             value: "// Start coding here...\n",
             language: "c",
             theme: "vs-dark",
@@ -125,15 +192,22 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
         });
 
-        document.querySelector('.submit-button').addEventListener('click', function() {
+        document.querySelector('#submit-button').addEventListener('click', function() {
             if (confirm("Are you sure to submit your code?")) {
                 const codeContent = editor.getValue();
                 const username = localStorage.getItem('username') || 'Unknown User';
-                const message = `Code Submission by ${username}:\n\n${codeContent}`;
-
+                const timeSpent = 60 * 60 - timeLeft; // Calculate time spent
+                const minutesSpent = Math.floor(timeSpent / 60);
+                const secondsSpent = timeSpent % 60;
+                const formattedTime = `${minutesSpent.toString().padStart(2, '0')}:${secondsSpent.toString().padStart(2, '0')}`;
+                
+                const message = `Code Submission by ${username}:\n\n${codeContent}\n\nTime Taken: ${formattedTime}`;
+        
                 sendTextToTelegram(message).then(() => {
                     alert('Code submitted successfully!');
-                    location.href = "thanku.html";
+                    if (window.location.pathname.endsWith('code7.html')) {
+                        location.href = "thanku.html";
+                    }
                 }).catch(error => {
                     console.error('Error during submission:', error);
                 });
@@ -141,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Resizable panels
     const resizer = document.querySelector('.resizer');
     const questionPanel = document.querySelector('.question-panel');
     const codeEditor = document.querySelector('.code-editor');
@@ -169,6 +244,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.cursor = 'default';
     });
 });
+
+function initClient() {
+    // Initialize the Google API client here
+}
 
 function sendTextToTelegram(message) {
     return fetch(`https://api.telegram.org/bot6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI/sendMessage`, {
