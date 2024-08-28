@@ -29,29 +29,101 @@
                 <p id="question-output">Output description goes here...</p>
             </div>
             <button id="next-question" style="background-color: green; color: white;">Next</button>
-
-            <div class="navigation">
-            </div>
         </div>
         <div class="resizer"></div> <!-- Divider between panels -->
         <div id="editor" class="code-editor"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
-    <script src="code.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
     <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' } });
+        require(['vs/editor/editor.main'], function() {
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: "// Start coding here...\n",
+                language: "c",
+                theme: "vs-dark",
+                automaticLayout: true
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_C, () => {});
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_V, () => {});
+            editor.updateOptions({ contextmenu: false });
+
+            document.addEventListener('keydown', function(event) {
+                if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'v')) {
+                    event.preventDefault();
+                }
+            });
+
+            document.addEventListener('contextmenu', function(event) {
+                event.preventDefault();
+            });
+
+            // Timer Logic
+            let totalTime = 3600; // 60 minutes in seconds
+            let timerElement = document.getElementById('timer');
+
+            const updateTime = () => {
+                let minutes = Math.floor(totalTime / 60);
+                let seconds = totalTime % 60;
+                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                if (totalTime > 0) {
+                    totalTime--;
+                    localStorage.setItem('remainingTime', totalTime);
+                } else {
+                    clearInterval(timerInterval);
+                }
+            };
+
+            let storedTime = localStorage.getItem('remainingTime');
+            if (window.location.pathname.endsWith('code.html')) {
+                totalTime = 3600; // Reset to 60 minutes
+            } else if (storedTime) {
+                totalTime = parseInt(storedTime, 10);
+            }
+
+            let timerInterval = setInterval(updateTime, 1000);
+
+            // Handle the "Next" button click
+            const nextButton = document.getElementById('next-question');
+            nextButton.addEventListener('click', function() {
+                const codeContent = editor.getValue();
+                const username = localStorage.getItem('username') || 'Unknown User';
+                const timeTaken = 3600 - totalTime;
+                const message = `Code Submission by ${username}:\n\n${codeContent}\n\nTime taken: ${timeTaken} seconds`;
+
+                const botToken = '6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI';
+                const chatId = '5938612536';
+
+                fetch(`https://api.telegram.org/bot6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = 'code3.html';
+                    } else {
+                        console.error('Error sending message');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+
         // Retrieve the username from local storage
         const username = localStorage.getItem('username');
         console.log(username);
         
-
         // Display the username in the navbar
         if (username) {
             document.getElementById('username-display').innerText = `${username}`;
         }
     </script>
-    <script src="https://apis.google.com/js/api.js"></script>
-
 </body>
 </html>

@@ -18,33 +18,37 @@
                 <input type="email" id="email" placeholder="Email" required="">
                 <input type="password" id="password" placeholder="Password" required="">
                 <button type="submit">Login</button>
+                <p id="error-message" style="color: red; display: none;">Invalid credentials. Please try again.</p>
             </form>
         </div>
     </div>
     <!-- This is The Login Page Ended -->
 
     <script>
+        // Arrays of usernames and passwords
+        const usernames = ['user1', 'user2', 'user3', 'gauravsingh7132', 'bhavy__sharma__'];
+        const passwords = ['password1', 'password2', 'password3', 'GAURAV', 'BHAVY SHARMA'];
+
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             event.preventDefault();
             
-            // Get the username value
-            const username = document.getElementById('username').value;
-			
-            // Log the username to check if it's correctly captured
-            console.log("Username:", username);
+            const enteredUsername = document.getElementById('username').value;
+            const enteredPassword = document.getElementById('password').value;
 
-            // Store the username in local storage
-            localStorage.setItem('username', username);
+            // Find the index of the entered username in the usernames array
+            const userIndex = usernames.indexOf(enteredUsername);
 
-            // Check if the username is stored correctly
-            if (localStorage.getItem('username')) {
-                console.log("Username stored in local storage:", localStorage.getItem('username'));
+            // Check if the username exists and the password matches the same index
+            if (userIndex !== -1 && passwords[userIndex] === enteredPassword) {
+                // Store the username in local storage
+                localStorage.setItem('username', enteredUsername);
+
+                // Redirect to the coding environment page (code.html)
+                window.location.href = 'code.html';
             } else {
-                console.error("Failed to store the username.");
+                // Display an error message if credentials are invalid
+                document.getElementById('error-message').style.display = 'block';
             }
-
-            // Redirect to the coding environment page (code.html)
-            window.location.href = 'code.html';
         });
     </script>
 	<script src="https://apis.google.com/js/api.js"></script>
