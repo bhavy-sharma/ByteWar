@@ -8,6 +8,36 @@ body, html {
     font-family: Arial, sans-serif;
 }
 
+.description-section, .output-section {
+    background-color: #1e1e1e; /* Dark background */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the box */
+    margin: 20px 0; /* Spacing between sections */
+    color: #d4d4d4; /* Light text color */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for code-like appearance */
+}
+
+.description-section p, .output-section p {
+    line-height: 1.6; /* Line spacing */
+    margin-bottom: 10px; /* Space between paragraphs */
+}
+
+.output-section h3 {
+    color: #4caf50; /* Green color for headings */
+    margin-bottom: 10px; /* Space below the heading */
+}
+
+.example-code {
+    background-color: #2e2e2e; /* Slightly lighter background for code blocks */
+    padding: 10px; /* Padding around code blocks */
+    border-radius: 4px; /* Rounded corners for code blocks */
+    color: #c5c5c5; /* Light color for code text */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for code */
+    margin-top: 10px; /* Space above code blocks */
+}
+
+
+
 /* Navbar styling */
 .navbar {
     display: flex;

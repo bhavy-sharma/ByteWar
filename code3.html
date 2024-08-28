@@ -6,6 +6,42 @@
     <title>ByteWar - Coding Environment</title>
     <link rel="stylesheet" href="codeStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/editor/editor.main.min.css">
+    <style>
+        /* Container for both panels */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px); /* Full height minus navbar */
+        }
+
+        /* Style for the question panel */
+        .question-panel {
+            width: 40%;
+            padding: 20px;
+            overflow-y: auto; /* Enables scrolling */
+            /* background-color: #f8f8f8; */
+            border-right: 2px solid #ddd;
+        }
+
+        /* Style for the code editor panel */
+        .code-editor {
+            width: 60%;
+            height: 100%;
+            overflow-y: auto; /* Enables scrolling */
+        }
+
+        /* Divider between panels */
+        .resizer {
+            width: 5px;
+            cursor: ew-resize;
+            background-color: #ddd;
+        }
+
+        /* Ensure the editor scrolls independently */
+        #editor {
+            height: 100%;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -19,19 +55,31 @@
     <div class="container">
         <div class="question-panel">
             <div class="title-section">
-                <h2 id="question-title">Question Title</h2>
+                <h2 id="question-title">Growing Patterns</h2>
             </div>
             <div class="description-section">
-                <p id="question-description">Question Description goes here...</p>
+                <p id="question-description">Description:
+                    You are given a sequence where each number is the sum of the two preceding ones, starting from 0 and 1. Your task is to generate this sequence up to a specified number of terms. The challenge lies in understanding how each number grows based on the previous ones and continuing the pattern.</p>
             </div>
             <div class="output-section">
                 <h3>Expected Output:</h3>
-                <p id="question-output">Output description goes here...</p>
+                <p id="question-output">Expected Output:
+                    For each input specifying the number of terms, output the sequence.</p>
+                <div class="example-code">
+                    <strong>Example Input:</strong><br>
+                    Input 1: 5 <br>
+Input 2: 7
+                </div>
+                <div class="example-code">
+                    <strong>Example Output:</strong><br>
+                    Output 1: 0, 1, 1, 2, 3 <br>
+Output 2: 0, 1, 1, 2, 3, 5, 8
+                </div>
             </div>
             <button id="next-question" style="background-color: green; color: white;">Next</button>
         </div>
         <div class="resizer"></div> <!-- Divider between panels -->
-        <div id="editor" class="code-editor"></div>
+        <div id="editor" class="code-editor" style="height: 500px; overflow-y: auto; background-color: #1e1e1e; border: 1px solid #333; border-radius: 4px;"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
@@ -60,7 +108,7 @@
             });
 
             // Timer Logic
-            let totalTime = 3600; // 60 minutes in seconds
+            let totalTime = parseInt(localStorage.getItem('remainingTime')) || 3600; // 60 minutes in seconds
             let timerElement = document.getElementById('timer');
 
             const updateTime = () => {
@@ -75,27 +123,35 @@
                 }
             };
 
-            let storedTime = localStorage.getItem('remainingTime');
-            if (window.location.pathname.endsWith('code.html')) {
-                totalTime = 3600; // Reset to 60 minutes
-            } else if (storedTime) {
-                totalTime = parseInt(storedTime, 10);
-            }
-
-            let timerInterval = setInterval(updateTime, 1000);
+            updateTime();
+            const timerInterval = setInterval(updateTime, 1000);
 
             // Handle the "Next" button click
             const nextButton = document.getElementById('next-question');
             nextButton.addEventListener('click', function() {
                 const codeContent = editor.getValue();
                 const username = localStorage.getItem('username') || 'Unknown User';
-                const timeTaken = 3600 - totalTime;
-                const message = `Code Submission by ${username}:\n\n${codeContent}\n\nTime taken: ${timeTaken} seconds`;
+                const questionTitle = document.getElementById('question-title').innerText.trim();
+                const expectedOutput = document.getElementById('question-output').innerText.trim();
+
+                // Calculate time taken for this question
+                let timeSpent = 3600 - totalTime - (parseInt(localStorage.getItem('previousTime')) || 0);
+                localStorage.setItem('previousTime', 3600 - totalTime);
+
+                const message = `
+Question: ${questionTitle}
+Expected Output: ${expectedOutput}
+Code Submission by ${username}:
+
+${codeContent}
+
+Time taken: ${Math.floor(timeSpent / 60)} minutes ${timeSpent % 60} seconds
+                `;
 
                 const botToken = '6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI';
                 const chatId = '5938612536';
 
-                fetch(`https://api.telegram.org/bot6991209062:AAHizmFI5XfGTE4oi-mR8yw7b5syhYKR_RI/sendMessage`, {
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -118,7 +174,6 @@
 
         // Retrieve the username from local storage
         const username = localStorage.getItem('username');
-        console.log(username);
         
         // Display the username in the navbar
         if (username) {
